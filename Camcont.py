@@ -38,13 +38,6 @@ pwmbrb = GPIO.PWM(5, freq)
 #mfr = f(21) b(20)
 #mbr = f(6)  b(5)
 
-Maxcorrectup=100
-Mincorrectup=100
-Maxcorrectdown=0
-Mincorrectdown=0
-Setpoint=0
-Error=0
-Waittime=1000
 
 # ^ = PID-Legacy-code
 
@@ -61,7 +54,75 @@ threshhold=90
 
 # ^ =cam setup, set here t make it global
 
-def camcap():
+def main():
+    try:
+        cumError = 0
+        lastError = 0
+        oldlinex = 80
+        cumin = 0
+        cumax = 0
+##        allforward(50)
+        #ALL below needs tuning on the numbers as the framesize was changed
+        while True:
+            #setpoint = 80
+            linex, oldlinex = camcap(oldlinex)
+            print(linex)
+            corr, cumError, lastError = PIDcont(linex, cumError, lastError)
+            if corr >= -30 and corr <= 30: #forward
+                allforward(50)
+            elif corr > 30: #right
+                turnleft(50)
+            elif corr < -30: #Left
+                turnright(50)
+            #testfunc()
+            if corr > cumax:
+                cumax = corr
+            if corr < cumin:
+                cumin = corr
+    except KeyboardInterrupt:
+        GPIO.cleanup()
+        print("Cumin: ", cumin)
+        print("Cumax: ", cumax)
+
+def PIDcont(linex, cumError, lastError):
+    pval = 4
+    ival = 0.2
+    dval = 2.5
+    setpoint = 80
+    MaxCorr = 200
+    MinCorr = -200
+    
+    error = setpoint - linex
+    pcorr = pval * error
+
+    # ^ P
+
+    cumError = cumError + error
+    icorr = ival*cumError
+
+    # ^ I
+
+    slope = error - lastError
+    dcorr = slope * dval
+    lastError = error
+
+    # ^ D
+
+    corr = pcorr + icorr + dcorr
+    print(pcorr, icorr, dcorr)
+    print(corr, cumError, lastError)
+
+    if corr > MaxCorr:
+        corr = MaxCorr
+    if corr < MinCorr:
+        corr = MinCorr
+
+    print("Correction", str(corr))
+
+    return(corr, cumError, lastError)
+    
+
+def camcap(oldlinex):
     ret, frame = cap.read()
     if cap.isOpened() == 0:
         cap.open(0)
@@ -95,27 +156,7 @@ def camcap():
         cap.release()
         cv2.destroyAllWindows()
 
-    return linex
-
-def main():
-    try:
-##        allforward(50)
-        #ALL below needs tuning on the numbers as the framesize was changed
-        while True:
-            #setpoint = 80
-            linex = camcap()
-            print(linex)
-            if linex > 70 and linex <= 90: #forward
-                allforward(100)
-            elif linex > 90: #right
-                turnright(40)
-            elif linex <= 70: #Left
-                turnleft(40)
-##            elif value[2] > 20000 and value[0] > 20000:
-##                backward(40)
-                #testfunc()
-    except KeyboardInterrupt:
-        GPIO.cleanup()
+    return linex, oldlinex
 
 def allforward(dc):
     GPIO.output(forward_stop, 0)
