@@ -51,8 +51,8 @@ Waittime=1000
 #Motorpins end
 
 cap = cv2.VideoCapture(0)
-width=80
-height=60
+width = 160
+height = 120
 ret = cap.set(3,width)
 ret = cap.set(4,height)
 #All this shit defines the taken picture
@@ -66,7 +66,7 @@ def camcap():
     if cap.isOpened() == 0:
         cap.open(0)
 
-    Blackline = cv2.inRange(frame, (0,0,0), (70,70,70))
+    Blackline = cv2.inRange(frame, (0,0,0), (50,50,50))
 
     kernel = np.ones((3,3), np.uint8)
 
@@ -74,14 +74,18 @@ def camcap():
 
     Blackline = cv2.dilate(Blackline, kernel, iterations=9)
 
-    frame, contours, hierachy = cv2.findContours(Blackline.copy(),cv2.RETR_TREE, cv2.CHAIN_APPOX_SIMPLE)
+    img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    if len(conrours) > 0:
+    if len(contours) > 0:
         x,y,w,h = cv2.boundingRect(contours[0])
 
-        linex = x+(w/2)
+        linex = int(x+(w/2))
 
         cv2.line(frame, (linex,0), (linex, height), (255,0,0),3)
+
+    else:
+        linex=oldlinex
+        oldlinex = linex
     
     cv2.imshow('frame',frame)  #Shows picture in frame called "frame"
 
@@ -91,8 +95,6 @@ def camcap():
         cap.release()
         cv2.destroyAllWindows()
 
-    print(linex)
-
     return linex
 
 def main():
@@ -100,17 +102,18 @@ def main():
 ##        allforward(50)
         #ALL below needs tuning on the numbers as the framesize was changed
         while True:
+            #setpoint = 80
             linex = camcap()
             print(linex)
-##            if value[1] < 9000: #forward
-##                allforward(100)
-##            elif value[0] > 14000 and value[2] < 14000: #right
-##                turnright(40)
-##            elif value[2] > 14000 and value[0] < 14000: #Left
-##                turnleft(40)
+            if linex > 70 and linex <= 90: #forward
+                allforward(100)
+            elif linex > 90: #right
+                turnright(40)
+            elif linex <= 70: #Left
+                turnleft(40)
 ##            elif value[2] > 20000 and value[0] > 20000:
 ##                backward(40)
-##                #testfunc()
+                #testfunc()
     except KeyboardInterrupt:
         GPIO.cleanup()
 
