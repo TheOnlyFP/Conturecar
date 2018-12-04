@@ -54,6 +54,16 @@ threshhold=90
 
 # ^ =cam setup, set here t make it global
 
+pwmflf.start(0)
+pwmblf.start(0)
+pwmfrf.start(0)
+pwmbrf.start(0)
+pwmflb.start(0)
+pwmblb.start(0)
+pwmfrb.start(0)
+pwmbrb.start(0)
+
+
 def main():
     try:
         cumError = 0
@@ -61,36 +71,35 @@ def main():
         oldlinex = 80
         cumin = 0
         cumax = 0
+        power=0
 ##        allforward(50)
         #ALL below needs tuning on the numbers as the framesize was changed
         while True:
             #setpoint = 80
             linex, oldlinex = camcap(oldlinex)
-            print(linex)
             corr, cumError, lastError = PIDcont(linex, cumError, lastError)
-            if corr >= -30 and corr <= 30: #forward
-                allforward(50)
+            if corr >= -50 and corr <= 50: #forward
+                allforward(100)
             elif corr > 30: #right
-                turnleft(50)
+                power = int((corr/160)*100)
+                print(power)
+                turnleft(power)
             elif corr < -30: #Left
-                turnright(50)
+                power = int((corr/-160)*100)s
+                print(power)
+                turnright(power)
             #testfunc()
-            if corr > cumax:
-                cumax = corr
-            if corr < cumin:
-                cumin = corr
     except KeyboardInterrupt:
+        print(power)
         GPIO.cleanup()
-        print("Cumin: ", cumin)
-        print("Cumax: ", cumax)
 
 def PIDcont(linex, cumError, lastError):
     pval = 4
     ival = 0.2
-    dval = 2.5
+    dval = 3
     setpoint = 80
-    MaxCorr = 200
-    MinCorr = -200
+    MaxCorr = 160
+    MinCorr = -160
     
     error = setpoint - linex
     pcorr = pval * error
@@ -109,8 +118,6 @@ def PIDcont(linex, cumError, lastError):
     # ^ D
 
     corr = pcorr + icorr + dcorr
-    print(pcorr, icorr, dcorr)
-    print(corr, cumError, lastError)
 
     if corr > MaxCorr:
         corr = MaxCorr
@@ -159,23 +166,46 @@ def camcap(oldlinex):
     return linex, oldlinex
 
 def allforward(dc):
-    GPIO.output(forward_stop, 0)
-    GPIO.output(forward_list, 1)
-
+    pwmflf.ChangeDutyCycle(dc)
+    pwmblf.ChangeDutyCycle(dc)
+    pwmfrf.ChangeDutyCycle(dc)
+    pwmbrf.ChangeDutyCycle(dc)
+    pwmflb.ChangeDutyCycle(0)
+    pwmblb.ChangeDutyCycle(0)
+    pwmfrb.ChangeDutyCycle(0)
+    pwmbrb.ChangeDutyCycle(0)
 
 def backward(dc):
-    GPIO.output(forward_list, 0)
-    GPIO.output(forward_stop, 1)
+    pwmflf.ChangeDutyCycle(0)
+    pwmblf.ChangeDutyCycle(0)
+    pwmfrf.ChangeDutyCycle(0)
+    pwmbrf.ChangeDutyCycle(0)
+    pwmflb.ChangeDutyCycle(dc)
+    pwmblb.ChangeDutyCycle(dc)
+    pwmfrb.ChangeDutyCycle(dc)
+    pwmbrb.ChangeDutyCycle(dc)
 
     
 def turnleft(dc):
-    GPIO.output(right_list, 0)
-    GPIO.output(left_list, 1)
+    pwmflb.ChangeDutyCycle(dc)
+    pwmblb.ChangeDutyCycle(dc)
+    pwmfrf.ChangeDutyCycle(dc)
+    pwmbrf.ChangeDutyCycle(dc)
+    pwmfrb.ChangeDutyCycle(0)
+    pwmbrb.ChangeDutyCycle(0)
+    pwmflf.ChangeDutyCycle(0)
+    pwmblf.ChangeDutyCycle(0)
 
 
 def turnright(dc):
-    GPIO.output(left_list, 0)
-    GPIO.output(right_list, 1)
+    pwmflb.ChangeDutyCycle(0)
+    pwmblb.ChangeDutyCycle(0)
+    pwmfrf.ChangeDutyCycle(0)
+    pwmbrf.ChangeDutyCycle(0)
+    pwmfrb.ChangeDutyCycle(dc)
+    pwmbrb.ChangeDutyCycle(dc)
+    pwmflf.ChangeDutyCycle(dc)
+    pwmblf.ChangeDutyCycle(dc)
 
 #left_list = [26,16,21,6] #to turn car left
 #right_list = [19,13,20,5] # -\\- right
