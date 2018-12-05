@@ -85,7 +85,7 @@ def main():
                 print(power)
                 turnleft(power)
             elif corr < -30: #Left
-                power = int((corr/-160)*100)s
+                power = int((corr/-160)*100)
                 print(power)
                 turnright(power)
             #testfunc()
@@ -94,9 +94,9 @@ def main():
         GPIO.cleanup()
 
 def PIDcont(linex, cumError, lastError):
-    pval = 4
-    ival = 0.2
-    dval = 3
+    pval = 2
+    ival = 0.1
+    dval = 4
     setpoint = 80
     MaxCorr = 160
     MinCorr = -160
