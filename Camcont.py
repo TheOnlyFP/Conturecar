@@ -161,7 +161,7 @@ def camcap(oldlinex):
     
     cv2.imshow('frame',frame)  #Shows picture in frame called "frame"
 
-    if cv2.waitKey(1) == ord('q'):  #Allows for quitting the the frame
+    if cv2.waitKey(1) == ord('q'):  #Allows for quitting the frame
         #Was changed back to 1 as it needs it to exist in a timeframe
         #for it to display the frame and go forward in the code
         cap.release()
