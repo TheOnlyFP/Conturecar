@@ -8,20 +8,24 @@ import cv2
 #import ends
 
 GPIO.setmode(GPIO.BCM)
-inchan_list = [27,23,22] #Insert Anime joke here
+#inchan_list = [27,23,22] #Insert Anime joke here
 outchan_list = [21,20,26,19,16,13,6,5] #-\\-
-GPIO.setup(inchan_list, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #Sets them up as inputs
-GPIO.setup(outchan_list, GPIO.OUT, initial=GPIO.LOW) #Sets them up as outputs
-
-freq= 15
-
-#setup end
 
 forward_list = [21,19,13,6] #All channels that make the wheels go forward
 forward_stop = [20,26,16,5] #Reverse, but also to turn the other direction off
 left_list = [26,16,21,6] #to turn car left / left motors go back
 right_list = [19,13,20,5] # -\\- right
 all_list = [20,19,13,5,21,26,16,6]
+
+GPIO.setup(inchan_list, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #Sets them up as inputs
+GPIO.setup(outchan_list, GPIO.OUT, initial=GPIO.LOW) #Sets them up as outputs
+
+
+freq= 15
+
+#setup end
+
+
 pwmflf = GPIO.PWM(19,freq)
 pwmblf = GPIO.PWM(13,freq)
 pwmfrf = GPIO.PWM(21,freq)
@@ -138,9 +142,9 @@ def camcap(oldlinex):
 
     kernel = np.ones((3,3), np.uint8)
 
-    Blackline = cv2.erode(Blackline, kernel, iterations=5)
+    Blackline = cv2.erode(Blackline, kernel, iterations=2)
 
-    Blackline = cv2.dilate(Blackline, kernel, iterations=9)
+    Blackline = cv2.dilate(Blackline, kernel, iterations=12)
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -158,8 +162,8 @@ def camcap(oldlinex):
     cv2.imshow('frame',frame)  #Shows picture in frame called "frame"
 
     if cv2.waitKey(1) == ord('q'):  #Allows for quitting the the frame
-        #Was changed back to 1 as it needs it to exist in a timeframe for it to display the frame
-        #and go forward in the code
+        #Was changed back to 1 as it needs it to exist in a timeframe
+        #for it to display the frame and go forward in the code
         cap.release()
         cv2.destroyAllWindows()
 
