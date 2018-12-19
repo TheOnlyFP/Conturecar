@@ -54,7 +54,7 @@ def linecalulator(frame, oldlinex):
     width = 160
     height = 120
 
-    Blackline = cv2.inRange(frame, (0,0,0), (50,50,50))
+    Blackline = cv2.inRange(frame, (0,0,0), (70,70,70))
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 

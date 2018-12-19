@@ -82,13 +82,13 @@ def main():
             #setpoint = 80
             linex, oldlinex = camcap(oldlinex)
             corr, cumError, lastError = PIDcont(linex, cumError, lastError)
-            if corr >= -40 and corr <= 40: #forward
+            if corr >= -50 and corr <= 50: #forward
                 allforward(50)
-            elif corr > 40: #right
+            elif corr > 50: #right
                 power = int((corr/160)*100)
                 print(power)
                 turnleft(power)
-            elif corr < -40: #Left
+            elif corr < -50: #Left
                 power = int((corr/-160)*100)
                 print(power)
                 turnright(power)
@@ -98,9 +98,9 @@ def main():
         GPIO.cleanup()
 
 def PIDcont(linex, cumError, lastError):
-    pval = 2.5
+    pval = 4.5
     ival = 0.1
-    dval = 2
+    dval = 1.7
     setpoint = 80
     MaxCorr = 160
     MinCorr = -160
@@ -141,6 +141,12 @@ def camcap(oldlinex):
     Blackline = cv2.inRange(frame, (0,0,0), (70,70,70))
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    kernel = np.ones((3,3), np.uint8)
+
+    Blackline= cv2.erode(Blackline, kernel, iterations = 5)
+
+    Blackline= cv2.dilate(Blackline, kernel, iterations = 9)
 
     if len(contours) > 0:
         x,y,w,h = cv2.boundingRect(contours[0])
@@ -185,6 +191,8 @@ def backward(dc):
 
     
 def turnleft(dc):
+    if dc < 30 :
+        dc = 30
     pwmflb.ChangeDutyCycle(0)
     pwmblb.ChangeDutyCycle(0)
     pwmfrf.ChangeDutyCycle(dc)
@@ -196,6 +204,8 @@ def turnleft(dc):
 
 
 def turnright(dc):
+    if dc < 30 :
+        dc = 30
     pwmflb.ChangeDutyCycle(0)
     pwmblb.ChangeDutyCycle(0)
     pwmfrf.ChangeDutyCycle(5)
