@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import RPi.GPIO as GPIO
-from time import sleep #Not used
+from time import sleep 
 import numpy as np #Needed for opencv it seems, also used in camcap()
 import cv2
 
@@ -17,7 +17,7 @@ left_list = [26,16,21,6] #to turn car left / left motors go back
 right_list = [19,13,20,5] # -\\- right
 all_list = [20,19,13,5,21,26,16,6]
 
-GPIO.setup(inchan_list, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #Sets them up as inputs
+#GPIO.setup(inchan_list, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #Sets them up as inputs
 GPIO.setup(outchan_list, GPIO.OUT, initial=GPIO.LOW) #Sets them up as outputs
 
 
@@ -56,7 +56,7 @@ ret = cap.set(4,height)
 threshhold=90
 #Defines threshhold for B/W conversion
 
-# ^ =cam setup, set here t make it global
+# ^ =cam setup, set here to make it global
 
 pwmflf.start(0)
 pwmblf.start(0)
@@ -98,9 +98,9 @@ def main():
         GPIO.cleanup()
 
 def PIDcont(linex, cumError, lastError):
-    pval = 2
+    pval = 1
     ival = 0.1
-    dval = 4
+    dval = 3
     setpoint = 80
     MaxCorr = 160
     MinCorr = -160
@@ -139,12 +139,6 @@ def camcap(oldlinex):
         cap.open(0)
 
     Blackline = cv2.inRange(frame, (0,0,0), (50,50,50))
-
-    kernel = np.ones((3,3), np.uint8)
-
-    Blackline = cv2.erode(Blackline, kernel, iterations=2)
-
-    Blackline = cv2.dilate(Blackline, kernel, iterations=12)
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
