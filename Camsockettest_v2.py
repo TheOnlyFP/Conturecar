@@ -49,7 +49,7 @@ def motorint():
     pwmbrb.start(0)
 
 def connector():
-    sendsocketip = '192.168.43.29' 
+    sendsocketip = '192.168.5.3' #PC
     sendsocketport = 55555
 
     sendsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -59,7 +59,7 @@ def connector():
 
 
 def serverint():
-    recsocketip = '192.168.43.113'
+    recsocketip = '192.168.3.10'
     recsocketport = 33333
 
     recsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -75,20 +75,20 @@ def main():
         oldlinex = 80
         cumin = 0
         cumax = 0
-        power=0
+        power = 0
 ##        allforward(50)
         #ALL below needs tuning on the numbers as the framesize was changed
         while True:
             #setpoint = 80
             linex, oldlinex = camcap(oldlinex)
             corr, cumError, lastError = PIDcont(linex, cumError, lastError)
-            if corr >= -50 and corr <= 50: #forward
-                allforward(100)
-            elif corr > 30: #right
+            if corr >= -40 and corr <= 40: #forward
+                allforward(50)
+            elif corr > 40: #right
                 power = int((corr/160)*100)
                 print(power)
                 turnleft(power)
-            elif corr < -30: #Left
+            elif corr < -40: #Left
                 power = int((corr/-160)*100)
                 print(power)
                 turnright(power)
@@ -98,9 +98,9 @@ def main():
         GPIO.cleanup()
 
 def PIDcont(linex, cumError, lastError):
-    pval = 1
+    pval = 2.5
     ival = 0.1
-    dval = 3
+    dval = 2
     setpoint = 80
     MaxCorr = 160
     MinCorr = -160
@@ -138,7 +138,7 @@ def camcap(oldlinex):
     if cap.isOpened() == 0:
         cap.open(0)
 
-    Blackline = cv2.inRange(frame, (0,0,0), (50,50,50))
+    Blackline = cv2.inRange(frame, (0,0,0), (70,70,70))
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -185,23 +185,23 @@ def backward(dc):
 
     
 def turnleft(dc):
-    pwmflb.ChangeDutyCycle(dc)
-    pwmblb.ChangeDutyCycle(dc)
+    pwmflb.ChangeDutyCycle(0)
+    pwmblb.ChangeDutyCycle(0)
     pwmfrf.ChangeDutyCycle(dc)
     pwmbrf.ChangeDutyCycle(dc)
     pwmfrb.ChangeDutyCycle(0)
     pwmbrb.ChangeDutyCycle(0)
-    pwmflf.ChangeDutyCycle(0)
-    pwmblf.ChangeDutyCycle(0)
+    pwmflf.ChangeDutyCycle(5)
+    pwmblf.ChangeDutyCycle(5)
 
 
 def turnright(dc):
     pwmflb.ChangeDutyCycle(0)
     pwmblb.ChangeDutyCycle(0)
-    pwmfrf.ChangeDutyCycle(0)
-    pwmbrf.ChangeDutyCycle(0)
-    pwmfrb.ChangeDutyCycle(dc)
-    pwmbrb.ChangeDutyCycle(dc)
+    pwmfrf.ChangeDutyCycle(5)
+    pwmbrf.ChangeDutyCycle(5)
+    pwmfrb.ChangeDutyCycle(0)
+    pwmbrb.ChangeDutyCycle(0)
     pwmflf.ChangeDutyCycle(dc)
     pwmblf.ChangeDutyCycle(dc)
 

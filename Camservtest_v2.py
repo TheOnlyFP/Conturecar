@@ -3,7 +3,7 @@ import numpy as np #Needed for opencv it seems, also used in camcap()
 import socket
 
 def initserv():
-    sendsocketip = '192.168.43.29'
+    sendsocketip = '192.168.5.3' #PC
     sendsocketport = 55555
 
     sendsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,7 +20,7 @@ def reconnector(sendsock):
 
 
 def connector():
-    recsocketip = '192.168.43.113' 
+    recsocketip = '192.168.3.10' 
     recsocketport = 33333
 
     print("attempting connection to client")
@@ -80,8 +80,8 @@ def linecalulator(frame, oldlinex):
     return linex, oldlinex
 
 def PIDcont(linex, cumError, lastError):
-    pval = 3
-    ival = 1
+    pval = 1
+    ival = 0.1
     dval = 3
     setpoint = 80
     MaxCorr = 160
