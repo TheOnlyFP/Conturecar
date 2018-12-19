@@ -126,13 +126,13 @@ def recval(connection):
     return value
 
 def motorstate(corr):
-    if corr >= -50 and corr <= 50: #forward
+    if corr >= -60 and corr <= 60: #forward
         allforward(100)
-    elif corr > 30: #right
+    elif corr > 40: #right
         power = int((corr/160)*100)
         print(power)
         turnleft(power)
-    elif corr < -30: #Left
+    elif corr < -40: #Left
         power = int((corr/-160)*100)
         print(power)
         turnright(power)
@@ -160,6 +160,8 @@ def backward(dc):
 
     
 def turnleft(dc):
+    if dc < 40 :
+        dc = 40
     pwmflb.ChangeDutyCycle(dc)
     pwmblb.ChangeDutyCycle(dc)
     pwmfrf.ChangeDutyCycle(dc)
@@ -171,6 +173,8 @@ def turnleft(dc):
 
 
 def turnright(dc):
+    if dc < 40 :
+        dc = 40
     pwmflb.ChangeDutyCycle(0)
     pwmblb.ChangeDutyCycle(0)
     pwmfrf.ChangeDutyCycle(0)

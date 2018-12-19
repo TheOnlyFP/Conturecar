@@ -58,6 +58,12 @@ def linecalulator(frame, oldlinex):
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+    kernel = np.ones((3,3), np.uint8)
+
+    Blackline= cv2.erode(Blackline, kernel, iterations = 5)
+
+    Blackline= cv2.dilate(Blackline, kernel, iterations = 9)
+
     if len(contours) > 0:
         x,y,w,h = cv2.boundingRect(contours[0])
 
@@ -80,9 +86,9 @@ def linecalulator(frame, oldlinex):
     return linex, oldlinex
 
 def PIDcont(linex, cumError, lastError):
-    pval = 1
+    pval = 4.7
     ival = 0.1
-    dval = 3
+    dval = 1.5
     setpoint = 80
     MaxCorr = 160
     MinCorr = -160

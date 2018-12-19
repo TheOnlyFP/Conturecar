@@ -82,13 +82,13 @@ def main():
             #setpoint = 80
             linex, oldlinex = camcap(oldlinex)
             corr, cumError, lastError = PIDcont(linex, cumError, lastError)
-            if corr >= -50 and corr <= 50: #forward
-                allforward(50)
-            elif corr > 50: #right
+            if corr >= -60 and corr <= 60: #forward
+                allforward(40)
+            elif corr > 40: #right
                 power = int((corr/160)*100)
                 print(power)
                 turnleft(power)
-            elif corr < -50: #Left
+            elif corr < -40: #Left
                 power = int((corr/-160)*100)
                 print(power)
                 turnright(power)
@@ -98,9 +98,9 @@ def main():
         GPIO.cleanup()
 
 def PIDcont(linex, cumError, lastError):
-    pval = 4.5
+    pval = 4.7
     ival = 0.1
-    dval = 1.7
+    dval = 1.5
     setpoint = 80
     MaxCorr = 160
     MinCorr = -160
@@ -191,8 +191,8 @@ def backward(dc):
 
     
 def turnleft(dc):
-    if dc < 30 :
-        dc = 30
+    if dc < 40 :
+        dc = 40
     pwmflb.ChangeDutyCycle(0)
     pwmblb.ChangeDutyCycle(0)
     pwmfrf.ChangeDutyCycle(dc)
@@ -204,8 +204,8 @@ def turnleft(dc):
 
 
 def turnright(dc):
-    if dc < 30 :
-        dc = 30
+    if dc < 40 :
+        dc = 40
     pwmflb.ChangeDutyCycle(0)
     pwmblb.ChangeDutyCycle(0)
     pwmfrf.ChangeDutyCycle(5)
