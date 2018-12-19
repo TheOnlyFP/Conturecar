@@ -1,7 +1,8 @@
+import RPi.GPIO as GPIO
 import cv2
 import numpy as np #Needed for opencv it seems, also used in camcap()
 import socket
-import time
+from time import sleep
 
 cap = cv2.VideoCapture(0)
 width = 160
@@ -79,14 +80,16 @@ def camcap(sendsock):
     if cap.isOpened() == 0:
         cap.open(0)
 
-    cv2.imshow("FirstframeX", frame)
+    print(frame.shape)
+
+    # cv2.imshow("FirstframeX", frame)
 
 
-    if cv2.waitKey(1) == ord('q'):  #Allows for quitting the frame
-        #Was changed back to 1 as it needs it to exist in a timeframe
-        #for it to display the frame and go forward in the code
-        cap.release()
-        cv2.destroyAllWindows()
+    # if cv2.waitKey(1) == ord('q'):  #Allows for quitting the frame
+    #     #Was changed back to 1 as it needs it to exist in a timeframe
+    #     #for it to display the frame and go forward in the code
+    #     cap.release()
+    #     cv2.destroyAllWindows()
 
     encodedframe = frame.tostring()
 
@@ -95,9 +98,9 @@ def camcap(sendsock):
     sendsock.shutdown(socket.SHUT_RDWR)
     sendsock.close()
 
-    nonbyteframe = np.frombuffer(encodedframe, np.uint8)
+    # nonbyteframe = np.frombuffer(encodedframe, np.uint8)
 
-    shapedframe = nonbyteframe.reshape(180,320,3) 
+    # shapedframe = nonbyteframe.reshape(120,160,3) 
 
 
 def recval(connection):
@@ -122,7 +125,7 @@ def recval(connection):
 
     return value
 
-def motstate(corr):
+def motorstate(corr):
     if corr >= -50 and corr <= 50: #forward
         allforward(100)
     elif corr > 30: #right
@@ -187,7 +190,7 @@ def main():
         print("camcap sendt")
         connection = serverconnector(recsock) #connect to recsock
         value = recval(connection) #get value from recsock
-        PID(value) 
+        motorstate(value) 
 
 
 main()

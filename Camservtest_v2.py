@@ -45,14 +45,7 @@ def showframe(connection):
     connection.shutdown(socket.SHUT_RDWR)
     connection.close()
 
-    shapedframe = np.frombuffer(encodedframe, np.uint8).reshape((180,320,3))
-
-    cv2.imshow("ServerframeX", shapedframe)
-
-    if cv2.waitKey(1) == ord('q'):  #Allows for quitting the frame
-        #Was changed back to 1 as it needs it to exist in a timeframe
-        #for it to display the frame and go forward in the code
-        cv2.destroyAllWindows() 
+    shapedframe = np.frombuffer(encodedframe, np.uint8).reshape((120,160,3))
 
     return shapedframe
 
@@ -77,12 +70,19 @@ def linecalulator(frame, oldlinex):
         linex=oldlinex
         oldlinex = linex
 
+    cv2.imshow("ServerframeX", frame)
+
+    if cv2.waitKey(1) == ord('q'):  #Allows for quitting the frame
+        #Was changed back to 1 as it needs it to exist in a timeframe
+        #for it to display the frame and go forward in the code
+        cv2.destroyAllWindows() 
+
     return linex, oldlinex
 
 def PIDcont(linex, cumError, lastError):
-    pval = 1
-    ival = 0.1
-    dval = 1
+    pval = 3
+    ival = 1
+    dval = 3
     setpoint = 80
     MaxCorr = 160
     MinCorr = -160
