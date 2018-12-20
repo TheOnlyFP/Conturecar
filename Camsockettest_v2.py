@@ -127,7 +127,7 @@ def recval(connection):
 
 def motorstate(corr):
     if corr >= -60 and corr <= 60: #forward
-        allforward(100)
+        allforward(50)
     elif corr > 40: #right
         power = int((corr/160)*100)
         print(power)
