@@ -17,7 +17,7 @@ MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
 MCP0=MCP3008(0)
 
 GPIO.setmode(GPIO.BCM)
-#inchan_list = [27,23,22] #Insert Anime joke here
+inchan_list = 27 #Insert Anime joke here
 outchan_list = [21,20,26,19,16,13,6,5] #-\\-
 
 forward_list = [21,19,13,6] #All channels that make the wheels go forward
@@ -26,7 +26,7 @@ left_list = [26,16,21,6] #to turn car left / left motors go back
 right_list = [19,13,20,5] # -\\- right
 all_list = [20,19,13,5,21,26,16,6]
 
-#GPIO.setup(inchan_list, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #Sets them up as inputs
+GPIO.setup(inchan_list, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #Sets them up as inputs
 GPIO.setup(outchan_list, GPIO.OUT, initial=GPIO.LOW) #Sets them up as outputs
 
 
@@ -85,37 +85,56 @@ def main():
         power = 0
         info_count = 0
         info_list = []
-        sock = socketconnect(host_ip, host_port)   
+        sock = socketconnect(host_ip, host_port)  
+        Buttoncounter = 0 
+        print("start")
         while True:
-            linex, oldlinex = camcap(oldlinex)
-            corr, cumError, lastError = PIDcont(linex, cumError, lastError)
+            print("IDLE")
+            while not GPIO.input(27):
+                pass
+            while GPIO.input(27):
+                pass
+            print("ACTIVE")
+            while not GPIO.input(27):
+                linex, oldlinex = camcap(oldlinex)
+                corr, cumError, lastError = PIDcont(linex, cumError, lastError)
 
-            powerleft = 100 - corr
-            powerright = 100 + corr
+                powerleft = 100 - corr
+                powerright = 100 + corr
 
-            if powerleft >= 100:
-                powerleft = 100
-            elif powerleft < 0:
-                powerleft = 0
+                if powerleft >= 100:
+                    powerleft = 100
+                elif powerleft < 0:
+                    powerleft = 0
 
-            if powerright >= 100:
-                powerright = 100
-            elif powerright < 0:
-                powerright = 0
+                if powerright >= 100:
+                    powerright = 100
+                elif powerright < 0:
+                    powerright = 0
 
-            powleft(powerleft)
-            powright(powerright)
+                powleft(powerleft)
+                powright(powerright)
 
 
-            info_count += 1
-            if info_count == 30:
-                info_list.append("MCP3008: " + str(checkvalMCP0(MCP0)))
-                info_list.append("Linex :" + str(linex))
-                info_list.append("Powerleft: " + str(powerleft))
-                info_list.append("Powerright: " + str(powerright))
-                sock.sendall(str(info_list).encode('utf-8'))
-                info_count = 0
-                info_list = []
+                info_count += 1
+                if info_count == 30:
+                    info_list.append("MCP3008: " + str(checkvalMCP0(MCP0)))
+                    info_list.append("Linex :" + str(linex))
+                    info_list.append("Powerleft: " + str(powerleft))
+                    info_list.append("Powerright: " + str(powerright))
+                    sock.sendall(str(info_list).encode('utf-8'))
+                    info_count = 0
+                    info_list = []
+            while GPIO.input(27):
+                pwmflf.ChangeDutyCycle(0)
+                pwmblf.ChangeDutyCycle(0)
+                pwmfrf.ChangeDutyCycle(0)
+                pwmbrf.ChangeDutyCycle(0)
+                pwmflb.ChangeDutyCycle(0)
+                pwmblb.ChangeDutyCycle(0)
+                pwmfrb.ChangeDutyCycle(0)
+                pwmbrb.ChangeDutyCycle(0)
+                pass
 
     except KeyboardInterrupt:
         GPIO.cleanup()
@@ -210,9 +229,6 @@ def checkvalMCP0(MCP0):
     return value
 
 #function end
-
-
-print("start") #Kinda not needed, looks good though
 
 main()
 

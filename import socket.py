@@ -28,5 +28,5 @@ def serveracc(sock):
     connection, fadd = sock.accept()
     return connection
     
-
-main()
+while True:
+    main()
