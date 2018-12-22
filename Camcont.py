@@ -1,11 +1,16 @@
 #!/usr/bin/python3
 
+# from gpiozero import MCP3008
 import RPi.GPIO as GPIO
 from time import sleep 
 import numpy as np #Needed for opencv it seems, also used in camcap()
 import cv2
 
 #import ends
+
+# MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
+
+# MCP0=MCP3008(0)
 
 GPIO.setmode(GPIO.BCM)
 #inchan_list = [27,23,22] #Insert Anime joke here
@@ -53,8 +58,6 @@ height = 120
 ret = cap.set(3,width)
 ret = cap.set(4,height)
 #All this shit defines the taken picture
-threshhold=90
-#Defines threshhold for B/W conversion
 
 # ^ =cam setup, set here to make it global
 
@@ -82,28 +85,53 @@ def main():
             #setpoint = 80
             linex, oldlinex = camcap(oldlinex)
             corr, cumError, lastError = PIDcont(linex, cumError, lastError)
-            if corr >= -60 and corr <= 60: #forward
-                allforward(40)
-            elif corr > 40: #right
-                power = int((corr/160)*100)
-                print(power)
-                turnleft(power)
-            elif corr < -40: #Left
-                power = int((corr/-160)*100)
-                print(power)
-                turnright(power)
+
+            # Make PID for each side seperatly? 
+            # Speed of left side = Desired speed - Corr
+            # Speed of right side = Desired speed + Corr
+            # If desired speed == 50%
+            # That would give 50% to tune in
+            # Base turning on differential speed-steering
+
+            powerleft = 100 - corr
+            powerright = 100 + corr
+
+            if powerleft >= 100:
+                powerleft = 100
+
+            if powerright >= 100:
+                powerright = 100
+
+            print(powerleft)
+            print(powerright)
+
+            powleft(powerleft)
+            powright(powerright)
+
+            # if corr >= -60 and corr <= 60: #forward
+            #     allforward(40)
+            # elif corr > 40: #right
+            #     power = int((corr/160)*100)
+            #     print(power)
+            #     turnleft(power)
+            # elif corr < -40: #Left
+            #     power = int((corr/-160)*100)
+            #     print(power)
+            #     turnright(power)
             #testfunc()
+        #MCPvalue = checkvalMCP0(MCP0)
+            print("\n")
     except KeyboardInterrupt:
         print(power)
         GPIO.cleanup()
 
 def PIDcont(linex, cumError, lastError):
-    pval = 4.7
+    pval = 3
     ival = 0.1
-    dval = 1.5
+    dval = 2.4
     setpoint = 80
-    MaxCorr = 160
-    MinCorr = -160
+    MaxCorr = 200
+    MinCorr = -200
     
     error = setpoint - linex
     pcorr = pval * error
@@ -138,15 +166,15 @@ def camcap(oldlinex):
     if cap.isOpened() == 0:
         cap.open(0)
 
-    Blackline = cv2.inRange(frame, (0,0,0), (70,70,70))
+    Blackline = cv2.inRange(frame, (0,0,0), (120,120,120))
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    kernel = np.ones((3,3), np.uint8)
+    # kernel = np.ones((3,3), np.uint8)
 
-    Blackline= cv2.erode(Blackline, kernel, iterations = 5)
+    # Blackline= cv2.erode(Blackline, kernel, iterations = 3)
 
-    Blackline= cv2.dilate(Blackline, kernel, iterations = 9)
+    # Blackline= cv2.dilate(Blackline, kernel, iterations = 9)
 
     if len(contours) > 0:
         x,y,w,h = cv2.boundingRect(contours[0])
@@ -157,7 +185,8 @@ def camcap(oldlinex):
 
     else:
         linex=oldlinex
-        oldlinex = linex
+
+    print(linex)
     
     cv2.imshow('frame',frame)  #Shows picture in frame called "frame"
 
@@ -169,51 +198,42 @@ def camcap(oldlinex):
 
     return linex, oldlinex
 
-def allforward(dc):
-    pwmflf.ChangeDutyCycle(dc)
-    pwmblf.ChangeDutyCycle(dc)
-    pwmfrf.ChangeDutyCycle(dc)
-    pwmbrf.ChangeDutyCycle(dc)
-    pwmflb.ChangeDutyCycle(0)
-    pwmblb.ChangeDutyCycle(0)
-    pwmfrb.ChangeDutyCycle(0)
-    pwmbrb.ChangeDutyCycle(0)
 
-def backward(dc):
-    pwmflf.ChangeDutyCycle(0)
-    pwmblf.ChangeDutyCycle(0)
-    pwmfrf.ChangeDutyCycle(0)
-    pwmbrf.ChangeDutyCycle(0)
-    pwmflb.ChangeDutyCycle(dc)
-    pwmblb.ChangeDutyCycle(dc)
-    pwmfrb.ChangeDutyCycle(dc)
-    pwmbrb.ChangeDutyCycle(dc)
-
-    
-def turnleft(dc):
-    if dc < 40 :
-        dc = 40
-    pwmflb.ChangeDutyCycle(0)
-    pwmblb.ChangeDutyCycle(0)
-    pwmfrf.ChangeDutyCycle(dc)
-    pwmbrf.ChangeDutyCycle(dc)
-    pwmfrb.ChangeDutyCycle(0)
-    pwmbrb.ChangeDutyCycle(0)
-    pwmflf.ChangeDutyCycle(5)
-    pwmblf.ChangeDutyCycle(5)
+def powleft(dc):
+    if dc >= 0:
+        pwmflb.ChangeDutyCycle(0)
+        pwmblb.ChangeDutyCycle(0)
+        pwmflf.ChangeDutyCycle(dc)
+        pwmblf.ChangeDutyCycle(dc)
+    else:
+        dc = dc*(-1)
+        pwmflb.ChangeDutyCycle(dc)
+        pwmblb.ChangeDutyCycle(dc)
+        pwmflf.ChangeDutyCycle(0)
+        pwmblf.ChangeDutyCycle(0)
 
 
-def turnright(dc):
-    if dc < 40 :
-        dc = 40
-    pwmflb.ChangeDutyCycle(0)
-    pwmblb.ChangeDutyCycle(0)
-    pwmfrf.ChangeDutyCycle(5)
-    pwmbrf.ChangeDutyCycle(5)
-    pwmfrb.ChangeDutyCycle(0)
-    pwmbrb.ChangeDutyCycle(0)
-    pwmflf.ChangeDutyCycle(dc)
-    pwmblf.ChangeDutyCycle(dc)
+def powright(dc):
+    if dc >= 0:
+        pwmfrb.ChangeDutyCycle(0)
+        pwmbrb.ChangeDutyCycle(0)
+        pwmfrf.ChangeDutyCycle(dc)
+        pwmbrf.ChangeDutyCycle(dc)
+    else:
+        dc = dc*(-1)
+        pwmfrb.ChangeDutyCycle(dc)
+        pwmbrb.ChangeDutyCycle(dc)
+        pwmfrf.ChangeDutyCycle(0)
+        pwmbrf.ChangeDutyCycle(0)       
+
+
+# def checkvalMCP0(MCP0):
+#     value = MCP0.value
+#     print(value)
+#     value = int(value*10)
+#     return value
+
+
 
 #left_list = [26,16,21,6] #to turn car left
 #right_list = [19,13,20,5] # -\\- right
