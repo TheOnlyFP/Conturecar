@@ -10,7 +10,7 @@ import socket
 #import ends
 
 host_ip = '192.168.3.1'
-host_port = 44444
+host_port = 44445
 
 MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
 
@@ -107,6 +107,8 @@ def main():
             while GPIO.input(27):
                 pass
 
+            sleep(0.2)
+
             print("ACTIVE")
             while not GPIO.input(27):
                 linex, oldlinex = camcap(oldlinex)
@@ -151,6 +153,8 @@ def main():
 
             while GPIO.input(27):
                 pass
+
+            sleep(0.2)
 
     except KeyboardInterrupt:
         GPIO.cleanup()
