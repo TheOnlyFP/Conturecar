@@ -85,22 +85,26 @@ def main():
         power = 0
         info_count = 0
         info_list = []
+        desireddc = 100
         sock = socketconnect(host_ip, host_port)  
         Buttoncounter = 0 
         print("start")
         while True:
+
             print("IDLE")
             while not GPIO.input(27):
                 pass
+
             while GPIO.input(27):
                 pass
+
             print("ACTIVE")
             while not GPIO.input(27):
                 linex, oldlinex = camcap(oldlinex)
                 corr, cumError, lastError = PIDcont(linex, cumError, lastError)
 
-                powerleft = 100 - corr
-                powerright = 100 + corr
+                powerleft = desireddc - corr
+                powerright = desireddc + corr
 
                 if powerleft >= 100:
                     powerleft = 100
@@ -125,15 +129,17 @@ def main():
                     sock.sendall(str(info_list).encode('utf-8'))
                     info_count = 0
                     info_list = []
+
+            pwmflf.ChangeDutyCycle(0)
+            pwmblf.ChangeDutyCycle(0)
+            pwmfrf.ChangeDutyCycle(0)
+            pwmbrf.ChangeDutyCycle(0)
+            pwmflb.ChangeDutyCycle(0)
+            pwmblb.ChangeDutyCycle(0)
+            pwmfrb.ChangeDutyCycle(0)
+            pwmbrb.ChangeDutyCycle(0)
+
             while GPIO.input(27):
-                pwmflf.ChangeDutyCycle(0)
-                pwmblf.ChangeDutyCycle(0)
-                pwmfrf.ChangeDutyCycle(0)
-                pwmbrf.ChangeDutyCycle(0)
-                pwmflb.ChangeDutyCycle(0)
-                pwmblb.ChangeDutyCycle(0)
-                pwmfrb.ChangeDutyCycle(0)
-                pwmbrb.ChangeDutyCycle(0)
                 pass
 
     except KeyboardInterrupt:
