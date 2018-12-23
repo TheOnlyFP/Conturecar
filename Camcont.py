@@ -9,8 +9,8 @@ import socket
 
 #import ends
 
-host_ip = '192.168.3.14'
-host_port = 44443
+host_ip = '192.168.3.1'
+host_port = 44444
 
 MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
 
@@ -77,21 +77,30 @@ pwmbrb.start(0)
 
 def main():
     try:
-        cumError = 0
-        lastError = 0
-        oldlinex = 80
-        cumin = 0
-        cumax = 0
-        power = 0
-        info_count = 0
-        info_list = []
+
+        pval = 3.5
+        ival = 0.01
+        dval = 4
+        setpoint = 80
+        MaxCorr = 100
+        MinCorr = -100
+
         desireddc = 100
+
+        info_list = []
+
         sock = socketconnect(host_ip, host_port)  
-        Buttoncounter = 0 
+
         print("start")
         while True:
 
             print("IDLE")
+
+            cumError = 0
+            lastError = 0
+            oldlinex = 80
+            info_count = 0
+
             while not GPIO.input(27):
                 pass
 
@@ -101,7 +110,8 @@ def main():
             print("ACTIVE")
             while not GPIO.input(27):
                 linex, oldlinex = camcap(oldlinex)
-                corr, cumError, lastError = PIDcont(linex, cumError, lastError)
+                corr, cumError, lastError = PIDcont(linex, cumError, lastError, pval, \
+                    ival, dval, setpoint, MaxCorr, MinCorr)
 
                 powerleft = desireddc - corr
                 powerright = desireddc + corr
@@ -150,14 +160,8 @@ def socketconnect(host_ip, host_port):
     sock.connect((host_ip, host_port))
     return sock
 
-def PIDcont(linex, cumError, lastError):
-    pval = 3.5
-    ival = 0.01
-    dval = 4
-    setpoint = 80
-    MaxCorr = 100
-    MinCorr = -100
-    
+def PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, MinCorr):
+
     error = setpoint - linex
     pcorr = pval * error
 
@@ -191,7 +195,8 @@ def camcap(oldlinex):
 
     Blackline = cv2.inRange(frame, (0,0,0), (110,110,110))
 
-    img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, \
+        cv2.CHAIN_APPROX_SIMPLE)
 
     if len(contours) > 0:
         x,y,w,h = cv2.boundingRect(contours[0])

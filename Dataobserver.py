@@ -1,21 +1,22 @@
 import socket
 
 def main():
-    host_ip = '192.168.3.14'
-    host_port = 44443
+    host_ip = '192.168.3.1'
+    host_port = 44444
     sock = servercreate(host_ip, host_port)
-    connection = serveracc(sock)
-    print("Connection made \n")
-    pack = ""
-    data = b''
     while True:
-        data = connection.recv(160)
-        data=data.decode('utf-8')
-        timedata = data[1:-2]
-        datalist = timedata.split(",")
-        print(datalist)
-        if not data:
-            break
+        connection = serveracc(sock)
+        print("Connection made \n")
+        while True:
+            data = b''
+            data = connection.recv(160)
+            data=data.decode('utf-8')
+            timedata = data[1:-2]
+            datalist = timedata.split(",")
+            for i in datalist:
+                print(i)
+            if not data:
+                break
 
 
 def servercreate(host_ip, host_port):
@@ -28,5 +29,4 @@ def serveracc(sock):
     connection, fadd = sock.accept()
     return connection
     
-while True:
-    main()
+main()
