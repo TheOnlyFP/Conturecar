@@ -1,9 +1,11 @@
+#!/usr/bin/python3
+
 import cv2
 import numpy as np #Needed for opencv it seems, also used in camcap()
 import socket
 
 def initserv():
-    sendsocketip = '192.168.5.3' #PC
+    sendsocketip = '192.168.3.14' #PC
     sendsocketport = 55555
 
     sendsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,7 +22,7 @@ def reconnector(sendsock):
 
 
 def connector():
-    recsocketip = '192.168.3.10' 
+    recsocketip = '192.168.5.2'  #Pi
     recsocketport = 33333
 
     print("attempting connection to client")
@@ -54,44 +56,29 @@ def linecalulator(frame, oldlinex):
     width = 160
     height = 120
 
-    Blackline = cv2.inRange(frame, (0,0,0), (70,70,70))
+    Blackline = cv2.inRange(frame, (0,0,0), (110,110,110))
 
-    img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    kernel = np.ones((3,3), np.uint8)
-
-    Blackline= cv2.erode(Blackline, kernel, iterations = 5)
-
-    Blackline= cv2.dilate(Blackline, kernel, iterations = 9)
+    img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, \
+        cv2.CHAIN_APPROX_SIMPLE)
 
     if len(contours) > 0:
         x,y,w,h = cv2.boundingRect(contours[0])
 
         linex = int(x+(w/2))
 
-        cv2.line(frame, (linex,0), (linex, height), (255,0,0),3)
 
     else:
-        print("No contour found")
         linex=oldlinex
-        oldlinex = linex
-
-    cv2.imshow("ServerframeX", frame)
-
-    if cv2.waitKey(1) == ord('q'):  #Allows for quitting the frame
-        #Was changed back to 1 as it needs it to exist in a timeframe
-        #for it to display the frame and go forward in the code
-        cv2.destroyAllWindows() 
 
     return linex, oldlinex
 
 def PIDcont(linex, cumError, lastError):
-    pval = 4.7
-    ival = 0.1
-    dval = 1.5
+    pval = 3.5
+    ival = 0.01
+    dval = 4
     setpoint = 80
-    MaxCorr = 160
-    MinCorr = -160
+    MaxCorr = 100
+    MinCorr = -100
     
     error = setpoint - linex
     pcorr = pval * error

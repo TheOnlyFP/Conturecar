@@ -10,7 +10,7 @@ import socket
 #import ends
 
 host_ip = '192.168.3.1'
-host_port = 44445
+host_port = 44444
 
 MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
 
@@ -206,8 +206,6 @@ def camcap(oldlinex):
         x,y,w,h = cv2.boundingRect(contours[0])
 
         linex = int(x+(w/2))
-
-        cv2.line(frame, (linex,0), (linex, height), (255,0,0),3)
 
 
     else:
