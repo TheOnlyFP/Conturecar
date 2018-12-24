@@ -174,10 +174,10 @@ def checkvalMCP0(MCP0):
     return value
 
 
-def datasocksend(sock, powerleft, powerright, linex):
+def datasocksend(sock, powerleft, powerright, corr):
     info_list = []
     info_list.append("MCP3008: " + str(checkvalMCP0(MCP0)))
-    info_list.append("Linex :" + str(linex))
+    info_list.append("Corr :" + str(corr))
     info_list.append("Powerleft: " + str(powerleft))
     info_list.append("Powerright: " + str(powerright))
     sock.sendall(str(info_list).encode('utf-8'))
@@ -193,9 +193,9 @@ def main():
         camcap(sendsock) #take and send frame over sendsock
         print("camcap sendt")
         connection = serverconnector(recsock) #connect to recsock
-        linex = recval(connection) #get value from recsock
-        powerleft, powerright = motorstate(linex, desireddc) 
-        datasocksend(datasock, powerleft, powerright, linex)
+        corr = recval(connection) #get value from recsock
+        powerleft, powerright = motorstate(corr, desireddc) 
+        datasocksend(datasock, powerleft, powerright, corr)
 
 
 

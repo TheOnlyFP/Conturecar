@@ -11,7 +11,7 @@ def main():
             while True:
                 data = b''
                 data = connection.recv(160)
-                data=data.decode('utf-8')
+                data = data.decode('utf-8')
                 timedata = data[1:-2]
                 datalist = timedata.split(",")
                 for i in datalist:
@@ -20,6 +20,7 @@ def main():
                 if not data:
                     break
     except KeyboardInterrupt:
+        connection.shutdown(socket.SHUT_RDWR)
         sock.close()
         print("socket closed")
 
