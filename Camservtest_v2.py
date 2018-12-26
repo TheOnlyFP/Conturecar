@@ -22,7 +22,7 @@ def reconnector(sendsock):
 
 
 def connector():
-    recsocketip = '192.168.5.2'  #Pi
+    recsocketip = '192.168.3.10'  #Pi
     recsocketport = 33333
 
     print("attempting connection to client")
@@ -56,7 +56,7 @@ def linecalulator(frame, oldlinex):
     width = 160
     height = 120
 
-    Blackline = cv2.inRange(frame, (0,0,0), (110,110,110))
+    Blackline = cv2.inRange(frame, (0,0,0), (100,100,100))
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, \
         cv2.CHAIN_APPROX_SIMPLE)
@@ -73,9 +73,9 @@ def linecalulator(frame, oldlinex):
     return linex, oldlinex
 
 def PIDcont(linex, cumError, lastError):
-    pval = 3.5
-    ival = 0.01
-    dval = 4
+    pval = 5.5
+    ival = 0.03
+    dval = 3
     setpoint = 80
     MaxCorr = 100
     MinCorr = -100

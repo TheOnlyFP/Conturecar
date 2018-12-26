@@ -67,7 +67,7 @@ def connector():
     return sendsock
 
 def serverint():
-    recsocketip = '192.168.5.2' #Pi
+    recsocketip = '192.168.3.10' #Pi
     recsocketport = 33333
 
     recsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -87,7 +87,6 @@ def dataconnect():
 
 
 def serverconnector(recsock):
-    print("listening")
     recsock.listen()
     connection, fromaddress = recsock.accept()
 
@@ -98,7 +97,6 @@ def camcap(sendsock):
     if cap.isOpened() == 0:
         cap.open(0)
 
-    print(frame.shape)
 
     encodedframe = frame.tostring()
 
@@ -121,8 +119,6 @@ def recval(connection):
     connection.close()
 
     value = data.decode('utf-8')
-
-    print("Decoded value: ", value)
 
     value = float(value)
 
@@ -191,7 +187,6 @@ def main():
     while True:
         sendsock = connector() #connect to server
         camcap(sendsock) #take and send frame over sendsock
-        print("camcap sendt")
         connection = serverconnector(recsock) #connect to recsock
         corr = recval(connection) #get value from recsock
         powerleft, powerright = motorstate(corr, desireddc) 

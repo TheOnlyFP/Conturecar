@@ -77,10 +77,9 @@ pwmbrb.start(0)
 
 def main():
     try:
-
-        pval = 3.5
-        ival = 0.01
-        dval = 4
+        pval = 5.5
+        ival = 0.03
+        dval = 3
         setpoint = 80
         MaxCorr = 100
         MinCorr = -100
@@ -112,8 +111,7 @@ def main():
             print("ACTIVE")
             while not GPIO.input(27):
                 linex, oldlinex = camcap(oldlinex)
-                corr, cumError, lastError = PIDcont(linex, cumError, lastError, pval, \
-                    ival, dval, setpoint, MaxCorr, MinCorr)
+                corr, cumError, lastError = PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, MinCorr)
 
                 powerleft = desireddc - corr
                 powerright = desireddc + corr
@@ -197,10 +195,9 @@ def camcap(oldlinex):
     if cap.isOpened() == 0:
         cap.open(0)
 
-    Blackline = cv2.inRange(frame, (0,0,0), (110,110,110))
+    Blackline = cv2.inRange(frame, (0,0,0), (100,100,100))
 
-    img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, \
-        cv2.CHAIN_APPROX_SIMPLE)
+    img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     if len(contours) > 0:
         x,y,w,h = cv2.boundingRect(contours[0])
@@ -238,7 +235,7 @@ def powright(dc):
 
 def checkvalMCP0(MCP0):
     value = MCP0.value
-    value = (value*10)
+    value = (value*100)
     return value
 
 #function end
