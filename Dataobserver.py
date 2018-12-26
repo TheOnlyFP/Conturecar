@@ -2,7 +2,7 @@ import socket
 
 def main():
     try:
-        host_ip = '192.168.3.1'
+        host_ip = '192.168.3.14'
         host_port = 44445
         sock = servercreate(host_ip, host_port)
         while True:

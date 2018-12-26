@@ -9,7 +9,7 @@ import socket
 
 #import ends
 
-host_ip = '192.168.3.1'
+host_ip = '192.168.3.14'
 host_port = 44445
 
 MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
@@ -17,7 +17,7 @@ MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
 MCP0=MCP3008(0)
 
 GPIO.setmode(GPIO.BCM)
-inchan_list = 27 #Insert Anime joke here
+inchan = 27 #Insert Anime joke here
 outchan_list = [21,20,26,19,16,13,6,5] #-\\-
 
 forward_list = [21,19,13,6] #All channels that make the wheels go forward
@@ -26,7 +26,7 @@ left_list = [26,16,21,6] #to turn car left / left motors go back
 right_list = [19,13,20,5] # -\\- right
 all_list = [20,19,13,5,21,26,16,6]
 
-GPIO.setup(inchan_list, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #Sets them up as inputs
+GPIO.setup(inchan, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #Sets them up as inputs
 GPIO.setup(outchan_list, GPIO.OUT, initial=GPIO.LOW) #Sets them up as outputs
 
 
@@ -133,7 +133,7 @@ def main():
 
 
                 info_count += 1
-                if info_count == 30:
+                if info_count == 50:
                     info_list.append("MCP3008: " + str(checkvalMCP0(MCP0)))
                     info_list.append("Linex: " + str(linex))
                     info_list.append("Powerleft: " + str(powerleft))
