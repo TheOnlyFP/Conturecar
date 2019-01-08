@@ -87,6 +87,7 @@ def main():
         desireddc = 100
 
         info_list = []
+        data_count = 0
 
         sock = socketconnect(host_ip, host_port)  
 
@@ -131,18 +132,20 @@ def main():
 
 
                 info_count += 1
-                if info_count == 50:
+                if info_count == 20:
                     info_list.append("MCP3008:")
-                    info_list.append(str(checkvalMCP0(MCP0)))
+                    info_list.append(checkvalMCP0(MCP0))
                     info_list.append("Linex:")
-                    info_list.append(str(linex))
+                    info_list.append(linex)
                     info_list.append("Powerleft:")
-                    info_list.append(str(powerleft))
+                    info_list.append(powerleft)
                     info_list.append("Powerright:")
-                    info_list.append(str(powerright))
+                    info_list.append(powerright)
+                    info_list.append(data_count)
                     
                     sock.sendall(str(info_list).encode('utf-8'))
                     info_count = 0
+                    data_count += 1
                     info_list = []
 
             pwmflf.ChangeDutyCycle(0)
