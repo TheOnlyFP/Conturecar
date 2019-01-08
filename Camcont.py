@@ -91,7 +91,6 @@ def main():
 
         sock = socketconnect(host_ip, host_port)  
 
-        print("start")
         while True:
 
             print("IDLE")
