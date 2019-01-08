@@ -9,7 +9,7 @@ import socket
 
 #import ends
 
-host_ip = '192.168.3.14'
+host_ip = '192.168.43.133'
 host_port = 44445
 
 MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
@@ -132,10 +132,15 @@ def main():
 
                 info_count += 1
                 if info_count == 50:
-                    info_list.append("MCP3008: " + str(checkvalMCP0(MCP0)))
-                    info_list.append("Linex: " + str(linex))
-                    info_list.append("Powerleft: " + str(powerleft))
-                    info_list.append("Powerright: " + str(powerright))
+                    info_list.append("MCP3008:")
+                    info_list.append(str(checkvalMCP0(MCP0)))
+                    info_list.append("Linex:")
+                    info_list.append(str(linex))
+                    info_list.append("Powerleft:")
+                    info_list.append(str(powerleft))
+                    info_list.append("Powerright:")
+                    info_list.append(str(powerright))
+                    
                     sock.sendall(str(info_list).encode('utf-8'))
                     info_count = 0
                     info_list = []
@@ -163,23 +168,23 @@ def socketconnect(host_ip, host_port):
     return sock
 
 def PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, MinCorr):
-
+    # Courtesy of Mark Harison: 
+    # https://www.youtube.com/watch?v=sDd4VOpOnnA&index=4&t=345s&list=WL
+    
+    # P
     error = setpoint - linex
     pcorr = pval * error
 
-    # ^ P
-
+    # I
     cumError = cumError + error
     icorr = ival*cumError
 
-    # ^ I
-
+    # D
     slope = error - lastError
     dcorr = slope * dval
     lastError = error
 
-    # ^ D
-
+    #PID
     corr = pcorr + icorr + dcorr
 
     if corr > MaxCorr:

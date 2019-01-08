@@ -2,7 +2,7 @@ import socket
 
 def main():
     try:
-        host_ip = '192.168.3.14'
+        host_ip = '192.168.43.133'
         host_port = 44445
         sock = servercreate(host_ip, host_port)
         while True:
@@ -12,7 +12,7 @@ def main():
                 data = b''
                 data = connection.recv(160)
                 data = data.decode('utf-8')
-                timedata = data[1:-2]
+                timedata = data[1:-1]
                 datalist = timedata.split(",")
                 for i in datalist:
                     print(i)
