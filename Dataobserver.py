@@ -14,13 +14,16 @@ def main():
                 data = data.decode('utf-8')
                 timedata = data[1:-1]
                 datalist = timedata.split(",")
-                for i in datalist:
-                    print(i)
+                print(datalist[0] + datalist[1])
+                print(datalist[2] + datalist[3])
+                print(datalist[4] + datalist[5])
+                print(datalist[6] + datalist[7])
+                print('count ' + datalist[8])
                 print("\n")
                 if not data:
                     break
     except KeyboardInterrupt:
-        connection.shutdown(socket.SHUT_RDWR)
+        connection.shutdown(socket.SHUT_RDWR)   
         sock.close()
         print("socket closed")
 
