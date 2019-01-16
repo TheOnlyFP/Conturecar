@@ -24,7 +24,7 @@ def animate(i,graphPWM,connectionQueue,graphPWMListLeft,graphPWMListRight,data_c
         if len(data_count) > 2:
             graphPWM.clear()
             graphPWM.set(ylabel='Duty Cycle',xlabel='Time',title='Car speed')
-            graphPWM.set_ylim([-5,105])
+            graphPWM.set_ylim([-25,105])
             graphPWM.set_xlim([data_count[0], data_count[-1]])
             plot1, = graphPWM.plot(data_count,graphPWMListLeft,'r', label='Left motors')
             plot2, = graphPWM.plot(data_count,graphPWMListRight,'g', label='Right motors')
