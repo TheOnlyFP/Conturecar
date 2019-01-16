@@ -77,9 +77,9 @@ pwmbrb.start(0)
 
 def main():
     try:
-        pval = 5
+        pval = 1.85
         ival = 0.03
-        dval = 3
+        dval = 2.4
         setpoint = 80
         MaxCorr = 150
         MinCorr = -150
@@ -114,6 +114,8 @@ def main():
                 linex = camcap(linex)
                 corr, cumError, lastError = PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, MinCorr)
 
+                print(corr)
+
                 powerleft = desireddc - corr
                 powerright = desireddc + corr
 
@@ -126,10 +128,6 @@ def main():
                     powerright = 100
                 elif powerright < -20:
                     powerright = -20
-
-
-                print(powerleft)
-                print(powerright)
 
                 powleft(powerleft)
                 powright(powerright)
@@ -207,7 +205,7 @@ def camcap(oldlinex):
     if cap.isOpened() == 0:
         cap.open(0)
 
-    Blackline = cv2.inRange(frame, (0,0,0), (100,100,100))
+    Blackline = cv2.inRange(frame, (0,0,0), (85,85,85))
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
