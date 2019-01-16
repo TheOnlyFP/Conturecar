@@ -9,8 +9,8 @@ import socket
 
 #import ends
 
-host_ip = '192.168.43.133'
-host_port = 44445
+host_ip = '192.168.43.29'
+host_port = 44444
 
 MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
 
@@ -77,27 +77,28 @@ pwmbrb.start(0)
 
 def main():
     try:
-        pval = 5.5
+        pval = 5
         ival = 0.03
         dval = 3
         setpoint = 80
-        MaxCorr = 100
-        MinCorr = -100
+        MaxCorr = 150
+        MinCorr = -150
 
-        desireddc = 100
+        desireddc = 80
 
         info_list = []
         data_count = 0
 
-        sock = socketconnect(host_ip, host_port)  
+        sock = socketconnect(host_ip, host_port) 
 
         while True:
 
             print("IDLE")
 
+            linex = 80
+            oldlinex = 80
             cumError = 0
             lastError = 0
-            oldlinex = 80
             info_count = 0
 
             while not GPIO.input(27):
@@ -110,7 +111,7 @@ def main():
 
             print("ACTIVE")
             while not GPIO.input(27):
-                linex, oldlinex = camcap(oldlinex)
+                linex = camcap(linex)
                 corr, cumError, lastError = PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, MinCorr)
 
                 powerleft = desireddc - corr
@@ -118,13 +119,17 @@ def main():
 
                 if powerleft >= 100:
                     powerleft = 100
-                elif powerleft < 0:
-                    powerleft = 0
+                elif powerleft < -20:
+                    powerleft = -20
 
                 if powerright >= 100:
                     powerright = 100
-                elif powerright < 0:
-                    powerright = 0
+                elif powerright < -20:
+                    powerright = -20
+
+
+                print(powerleft)
+                print(powerright)
 
                 powleft(powerleft)
                 powright(powerright)
@@ -214,8 +219,9 @@ def camcap(oldlinex):
 
     else:
         linex=oldlinex
+        print(linex)
 
-    return linex, oldlinex
+    return linex
 
 
 #left_list = [26,16,21,6] #to turn car left
@@ -223,21 +229,32 @@ def camcap(oldlinex):
 
 
 def powleft(dc):
-    if dc < 0:
-        dc = 0
-    pwmflb.ChangeDutyCycle(0)
-    pwmblb.ChangeDutyCycle(0)
-    pwmflf.ChangeDutyCycle(dc)
-    pwmblf.ChangeDutyCycle(dc)
+    if dc >= 0:
+        pwmflb.ChangeDutyCycle(0)
+        pwmblb.ChangeDutyCycle(0)
+        pwmflf.ChangeDutyCycle(dc)
+        pwmblf.ChangeDutyCycle(dc)
+    elif dc < 0:
+        dc = dc * -1
+        pwmflb.ChangeDutyCycle(dc)
+        pwmblb.ChangeDutyCycle(dc)
+        pwmflf.ChangeDutyCycle(0)
+        pwmblf.ChangeDutyCycle(0)
 
 
 def powright(dc):
+    if dc >= 0:
+        pwmfrb.ChangeDutyCycle(0)
+        pwmbrb.ChangeDutyCycle(0)
+        pwmfrf.ChangeDutyCycle(dc)
+        pwmbrf.ChangeDutyCycle(dc)      
     if dc < 0:
-        dc = 0
-    pwmfrb.ChangeDutyCycle(0)
-    pwmbrb.ChangeDutyCycle(0)
-    pwmfrf.ChangeDutyCycle(dc)
-    pwmbrf.ChangeDutyCycle(dc)      
+        dc = dc * -1
+        pwmfrb.ChangeDutyCycle(dc)
+        pwmbrb.ChangeDutyCycle(dc)
+        pwmfrf.ChangeDutyCycle(0)
+        pwmbrf.ChangeDutyCycle(0)  
+
 
 
 def checkvalMCP0(MCP0):
