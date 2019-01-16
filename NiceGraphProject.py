@@ -45,7 +45,7 @@ def connector(connection,connectionQueue):
         connectionQueue.put(dataReceived)
     
 def main():        
-    # style.use('fivethirtyeight')
+    style.use('seaborn-whitegrid')
     
     fig = plt.figure(figsize=(8,7))
     graphPWM = fig.add_subplot(2,1,1)
