@@ -1,2 +1,2 @@
 # Line-following Car
-This project revovls around creating a line-following car
+This project revolvs around creating a line-following car.
