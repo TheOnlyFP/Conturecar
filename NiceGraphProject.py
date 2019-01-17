@@ -11,6 +11,7 @@ Port = 44445
 def animate(i,graphPWM,connectionQueue,graphPWMListLeft,graphPWMListRight,data_count,graphMCP):
     if not connectionQueue.empty():
         dataReceived = connectionQueue.get()
+        dataCountRecieved = connectionQueue.get()
         
         if len(graphPWMListLeft) == 50:
             graphPWMListLeft.pop(0)
@@ -19,7 +20,7 @@ def animate(i,graphPWM,connectionQueue,graphPWMListLeft,graphPWMListRight,data_c
         
         graphPWMListLeft.append(int(float(dataReceived[5]))) 
         graphPWMListRight.append(int(float(dataReceived[7])))
-        data_count.append(int(float(dataReceived[8])))
+        data_count.append(int(float(dataCountRecieved)))
         
         if len(data_count) > 2:
             graphPWM.clear()
@@ -38,11 +39,14 @@ def animate(i,graphPWM,connectionQueue,graphPWMListLeft,graphPWMListRight,data_c
             graphMCP.bar('',percentage)
 
 def connector(connection,connectionQueue):
+    dataCount = 0
     while True:
         receivedData = connection.recv(160)
         dataReceived = receivedData.decode('utf-8')
         dataReceived = dataReceived[1:-1].split(",")
         connectionQueue.put(dataReceived)
+        connectionQueue.put(dataCount)
+        dataCount += 1
     
 def main():        
     style.use('seaborn-whitegrid')
