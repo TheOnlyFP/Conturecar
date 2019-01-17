@@ -78,15 +78,14 @@ pwmbrb.start(0)
 def main():
     try:
         pval = 1.85
-        ival = 0.03
+        ival = 0.0
         dval = 2.4
         setpoint = 80
-        MaxCorr = 150
-        MinCorr = -150
+        # MaxCorr = 150
+        # MinCorr = -150
 
         desireddc = 80
 
-        info_list = []
         data_count = 0
 
         sock = socketconnect(host_ip, host_port) 
@@ -112,43 +111,32 @@ def main():
             print("ACTIVE")
             while not GPIO.input(27):
                 linex = camcap(linex)
-                corr, cumError, lastError = PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, MinCorr)
-
-                print(corr)
+                corr, cumError, lastError = PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint) #, MaxCorr, MinCorr)
 
                 powerleft = desireddc - corr
                 powerright = desireddc + corr
 
                 if powerleft >= 100:
                     powerleft = 100
-                elif powerleft < -20:
-                    powerleft = -20
+                elif powerleft < -10:
+                    powerleft = -10
 
                 if powerright >= 100:
                     powerright = 100
-                elif powerright < -20:
-                    powerright = -20
+                elif powerright < -10:
+                    powerright = -10
 
                 powleft(powerleft)
                 powright(powerright)
 
 
                 info_count += 1
-                if info_count == 20:
-                    info_list.append("MCP3008:")
-                    info_list.append(checkvalMCP0(MCP0))
-                    info_list.append("Linex:")
-                    info_list.append(linex)
-                    info_list.append("Powerleft:")
-                    info_list.append(powerleft)
-                    info_list.append("Powerright:")
-                    info_list.append(powerright)
-                    info_list.append(data_count)
-                    
+                if info_count == 30:
+                    info_list = []
+                    info_list = (["MCP3008:", checkvalMCP0(MCP0), "Linex:", linex, "Powerleft:", powerleft, "Powerright:", powerright])                    
                     sock.sendall(str(info_list).encode('utf-8'))
                     info_count = 0
-                    data_count += 1
-                    info_list = []
+
 
             pwmflf.ChangeDutyCycle(0)
             pwmblf.ChangeDutyCycle(0)
@@ -172,7 +160,7 @@ def socketconnect(host_ip, host_port):
     sock.connect((host_ip, host_port))
     return sock
 
-def PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, MinCorr):
+def PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint): #, MaxCorr, MinCorr):
     # Courtesy of Mark Harison: 
     # https://www.youtube.com/watch?v=sDd4VOpOnnA&index=4&t=345s&list=WL
     
@@ -181,8 +169,8 @@ def PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, Min
     pcorr = pval * error
 
     # I
-    cumError = cumError + error
-    icorr = ival*cumError
+    # cumError = cumError + error
+    # icorr = ival*cumError
 
     # D
     slope = error - lastError
@@ -190,12 +178,12 @@ def PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, Min
     lastError = error
 
     #PID
-    corr = pcorr + icorr + dcorr
+    corr = pcorr + dcorr #+ icorr
 
-    if corr > MaxCorr:
-        corr = MaxCorr
-    if corr < MinCorr:
-        corr = MinCorr
+    # if corr > MaxCorr:
+    #     corr = MaxCorr
+    # if corr < MinCorr:
+    #     corr = MinCorr
 
     return(corr, cumError, lastError)
     
@@ -205,7 +193,11 @@ def camcap(oldlinex):
     if cap.isOpened() == 0:
         cap.open(0)
 
-    Blackline = cv2.inRange(frame, (0,0,0), (85,85,85))
+    # while ret == False:
+    #     print("cam")
+    #     sleep(0.1)
+
+    Blackline = cv2.inRange(frame, (0,0,0), (75,75,75))
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
