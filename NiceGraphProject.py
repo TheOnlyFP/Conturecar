@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style 
 
-Host = '192.168.43.133'
-Port = 44445
+Host = '192.168.43.29'
+Port = 44444
     
 def animate(i,graphPWM,connectionQueue,graphPWMListLeft,graphPWMListRight,data_count,graphMCP):
     if not connectionQueue.empty():
