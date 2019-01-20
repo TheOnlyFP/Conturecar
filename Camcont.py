@@ -88,7 +88,7 @@ def main():
 
         data_count = 0
 
-        # sock = socketconnect(host_ip, host_port) 
+        sock = socketconnect(host_ip, host_port) 
 
         while True:
 
@@ -133,13 +133,13 @@ def main():
                 powright(powerright)
 
 
-                # info_count += 1
-                # if info_count == 30:
-                #     info_list = []
-                #     info_list = (["MCP3008:", checkvalMCP0(MCP0), "Linex:", linex, "Powerleft:", powerleft, "Powerright:", powerright])
+                info_count += 1
+                if info_count == 30:
+                    info_list = []
+                    info_list = (["MCP3008:", checkvalMCP0(MCP0), "Linex:", linex, "Powerleft:", powerleft, "Powerright:", powerright])
                     
-                #     sock.sendall(str(info_list).encode('utf-8'))
-                #     info_count = 0
+                    sock.sendall(str(info_list).encode('utf-8'))
+                    info_count = 0
 
 
             pwmflf.ChangeDutyCycle(0)
