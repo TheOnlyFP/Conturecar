@@ -78,7 +78,7 @@ pwmbrb.start(0)
 def main():
     try:
         pval = 2
-        ival = 0.03
+        ival = 0
         dval = 1
         setpoint = 80
         MaxCorr = 150
@@ -88,7 +88,7 @@ def main():
 
         data_count = 0
 
-        # sock = socketconnect(host_ip, host_port) 
+        sock = socketconnect(host_ip, host_port) 
 
         while True:
 
@@ -126,20 +126,17 @@ def main():
                 elif powerright < 0:
                     powerright = 0
 
-                print("Left: ", powerleft)
-                print("Right: ", powerright)
-
                 powleft(powerleft)
                 powright(powerright)
 
 
-                # info_count += 1
-                # if info_count == 30:
-                #     info_list = []
-                #     info_list = (["MCP3008:", checkvalMCP0(MCP0), "Linex:", linex, "Powerleft:", powerleft, "Powerright:", powerright])
+                info_count += 1
+                if info_count == 30:
+                    info_list = []
+                    info_list = (["MCP3008:", checkvalMCP0(MCP0), "Linex:", linex, "Powerleft:", powerleft, "Powerright:", powerright])
                     
-                #     sock.sendall(str(info_list).encode('utf-8'))
-                #     info_count = 0
+                    sock.sendall(str(info_list).encode('utf-8'))
+                    info_count = 0
 
 
             pwmflf.ChangeDutyCycle(0)
@@ -197,11 +194,11 @@ def camcap(oldlinex):
     if cap.isOpened() == 0:
         cap.open(0)
 
-    # while ret == False:
-    #     print("cam")
-    #     sleep(0.1)
+    while ret == False:
+        print("cam")
+        sleep(0.1)
 
-    Blackline = cv2.inRange(frame, (0,0,0), (80,80,80))
+    Blackline = cv2.inRange(frame, (0,0,0), (70,70,70))
 
     img, contours, hierachy = cv2.findContours(Blackline.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
