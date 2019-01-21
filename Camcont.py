@@ -10,7 +10,7 @@ import socket
 #import ends
 
 host_ip = '192.168.43.29'
-host_port = 44444
+host_port = 44445
 
 MCP3008(channel=0, clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8)
 
@@ -170,8 +170,8 @@ def PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, Min
     pcorr = pval * error
 
     # I
-    cumError = cumError + error
-    icorr = ival*cumError
+    # cumError = cumError + error
+    # icorr = ival*cumError
 
     # D
     slope = error - lastError
@@ -179,7 +179,7 @@ def PIDcont(linex, cumError, lastError, pval, ival, dval, setpoint, MaxCorr, Min
     lastError = error
 
     #PID
-    corr = pcorr + dcorr + icorr
+    corr = pcorr + dcorr #+ icorr
 
     if corr > MaxCorr:
         corr = MaxCorr
